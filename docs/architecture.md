@@ -85,24 +85,51 @@ class RFPProposal:
     analysis_score: Optional[float] = None
 ```
 
+## Data Models
+
+### RFP Proposal
+```python
+@dataclass
+class RFPProposal:
+    id: str                           # Unique identifier
+    filename: str                     # Original PDF filename (validated)
+    content: str                      # Extracted text content (size-limited)
+    extracted_data: Dict[str, Any]    # Structured data from content
+    analysis_score: Optional[float]   # AI analysis score (0-100)
+    created_at: datetime              # Timestamp
+```
+
+**Security Features:**
+- Path traversal prevention in filenames
+- File extension validation (PDF only)
+- Content length limits (10MB max)
+- Input sanitization and validation
+
+### Analysis Result
+```python
+@dataclass
+class AnalysisResult:
+    proposal_id: str                  # Links to RFPProposal
+    overall_score: float              # Weighted final score (0-100)
+    criteria_scores: Dict[str, float] # Individual criteria scores
+    strengths: List[str]              # Positive aspects identified
+    concerns: List[str]               # Issues or risks identified
+    recommendation_rank: Optional[int] # Ranking among proposals
+    created_at: datetime              # Analysis timestamp
+```
+
+**Key Features:**
+- Immutable after creation (audit trail)
+- Automatic weighted score calculation
+- Business rule validation
+- Serialization/deserialization support
+
 ### Analysis Criteria (Fixed for MVP)
 - **Price/Cost** (30% weight)
 - **Technical Approach** (25% weight)
 - **Experience/Qualifications** (20% weight)
 - **Timeline/Delivery** (15% weight)
 - **Risk Assessment** (10% weight)
-
-### Analysis Result
-```python
-@dataclass
-class AnalysisResult:
-    proposal_id: str
-    overall_score: float
-    criteria_scores: Dict[str, float]
-    strengths: List[str]
-    concerns: List[str]
-    recommendation_rank: int
-```
 
 ## API Design
 

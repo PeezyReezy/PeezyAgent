@@ -70,13 +70,14 @@ PeezyAgent/
 ├── src/                    # Main source code
 │   ├── core/              # Core application components
 │   │   ├── config.py      # Configuration management ✅
-│   │   ├── models.py      # Data models (next sprint)
+│   │   ├── models.py      # Data models ✅
 │   │   └── logger.py      # Logging configuration (next sprint)
 │   ├── ai/                # AI integration
 │   ├── processors/        # PDF processing
 │   └── web/               # Web interface
 ├── tests/                 # Test files
-│   ├── test_config.py     # Configuration tests ✅
+│   ├── test_config.py     # Configuration tests ✅ (12 tests)
+│   ├── test_models.py     # Data model tests ✅ (11 tests)
 │   └── ...
 ├── docs/                  # Documentation
 ├── requirements.txt       # Python dependencies
@@ -167,7 +168,10 @@ python -m pytest tests/ --cov=src --cov-report=html
 - [x] Input validation and sanitization
 - [x] Logging integration
 - [x] Security features (config freezing, secret generation)
-- [x] Comprehensive test coverage (12/12 tests passing)
+- [x] Core data models (RFPProposal, AnalysisResult)
+- [x] Data model security validations
+- [x] Serialization/deserialization support
+- [x] Comprehensive test coverage (23/23 tests passing)
 - [x] Code review and refactoring
 
 **Key Features Implemented:**
@@ -176,13 +180,60 @@ python -m pytest tests/ --cov=src --cov-report=html
 - Configuration validation
 - .env file support
 - Immutable configuration after initialization
+- Robust data models with business rule validation
+- Security features: path traversal prevention, file type validation, content size limits
+- Helper methods for serialization and debugging
 
-### Next Sprint: Core Data Models
+### Next Sprint: PDF Processing
 **Planned:**
-- [ ] RFP Proposal data model
-- [ ] Analysis Result data model
-- [ ] Data validation and serialization
-- [ ] Model relationships and constraints
+- [ ] PDF text extraction with PyPDF2
+- [ ] Content parsing and structuring
+- [ ] File upload handling and validation
+- [ ] Error handling for malformed PDFs
+
+## Data Models
+
+### Using RFPProposal
+```python
+from src.core.models import RFPProposal
+
+# Create from parameters
+proposal = RFPProposal(
+    id='prop-001',
+    filename='vendor_proposal.pdf',
+    content='Extracted PDF text...'
+)
+
+# Serialize to dictionary
+data = proposal.to_dict()
+
+# Create from dictionary (e.g., from database)
+proposal = RFPProposal.from_dict(data)
+```
+
+### Using AnalysisResult
+```python
+from src.core.models import AnalysisResult
+
+# Create with automatic score calculation
+result = AnalysisResult(
+    proposal_id='prop-001',
+    criteria_scores={
+        'price': 85.0,
+        'technical_approach': 90.0,
+        'experience': 80.0
+    }
+)
+
+# Overall score is calculated automatically using default weights
+print(result.overall_score)  # Weighted average
+```
+
+### Security Features
+- **Path traversal prevention**: Filenames cannot contain `../` or `\`
+- **File type validation**: Only `.pdf` files accepted
+- **Content size limits**: Maximum 10MB of text content
+- **Immutable analysis**: Results cannot be modified after creation
 
 ## Troubleshooting
 
